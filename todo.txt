@@ -1,0 +1,15 @@
+Difficulty settings
+Menus-
+    -Main
+    -settings
+Power ups-
+    -Lazer
+    -passthrough bullets (bullets that hit and go through aliens)
+    -super slow down time
+    -thicker bullets
+    -unlimited bullets
+    -nuke from call of duty
+wave counter
+score counter
+bosses
+ 
