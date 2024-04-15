@@ -6,6 +6,7 @@ from bullet import Bullet
 from alien import Alien
 from game_stats import GameStats
 from time import sleep
+from button import Button
 
 class Invasion:
     """This clas manges the behavior of the game"""
@@ -24,6 +25,9 @@ class Invasion:
 
 
         self._create_fleet()
+
+        self.play_button = Button(self, "Play")
+
         pygame.display.set_caption("Super Space Invaders 2025")
         self.stats = GameStats(self)
         self.bg_color = self.settings.bg_color
@@ -58,9 +62,10 @@ class Invasion:
         """start the main game loop"""
         while True:
             self._check_events()
-            self.ship.update()
-            self._update_aliens()
-            self._update_bullets()
+            if self.stats.game_active:    
+                self.ship.update()
+                self._update_aliens()
+                self._update_bullets()
             self._update_screen()
     
     def _update_aliens(self):
@@ -70,11 +75,18 @@ class Invasion:
 
         if pygame.sprite.spritecollideany(self.ship, self.aliens):
             self._ship_hit()
+        
+        self._check_aliens_bottom()
     
     def _ship_hit(self):
         """Responds to an alien hitting the ship"""
-        print("Ship Hit!!!")
-        self.stats.ships_left -= 1
+        if self.stats.ships_left > 0:
+            print("Ship Hit!!!")
+            self.stats.ships_left -= 1
+            print(f"Lives Left: {self.stats.ships_left}")
+        else:
+            self.stats.game_active = False
+            pygame.mouse.set_visible(True)
 
         #Get rid of any aliens or bullets left on screen
         self.aliens.empty()
@@ -83,7 +95,7 @@ class Invasion:
         self._create_fleet()
         self.ship.center_ship()
 
-        sleep(3)
+        sleep(.5)
 
     def _update_bullets(self):
         self.bullets.update()
@@ -99,6 +111,8 @@ class Invasion:
         if not self.aliens:
             self.bullets.empty()
             self._create_fleet()
+            print("Balls")
+            self.settings.increase_speed()
 
     def _check_events(self):
         #Watch for keyboard events
@@ -109,6 +123,29 @@ class Invasion:
                 self._check_keydown_events(event)
             elif event.type == pygame.KEYUP: #Checks for keys released
                 self._check_keyup_events(event)
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+                self._check_play_button(mouse_pos)
+
+    def _check_play_button(self, mouse_pos):
+        """Start a new game when the player clicks Play."""
+        button_clicked = self.play_button.rect.collidepoint(mouse_pos)
+        if button_clicked and not self.stats.game_active:
+            # Reset the game settings.
+            self.settings.initialize_dynamic_settings()
+            self.stats.reset_stats()
+            self.stats.game_active = True
+
+            # Hide Mouse Cursor.
+            pygame.mouse.set_visible(False)
+
+            # Get rid of any remaining aliens and bullets.
+            self.aliens.empty()
+            self.bullets.empty()
+
+            # Create a new fleet and cemter the ship.
+            self._create_fleet()
+            self.ship.center_ship()
             
     def _check_keydown_events(self, event):
         """Respond to keypresses."""
@@ -138,6 +175,10 @@ class Invasion:
         self.screen.fill(self.bg_color)
         self.ship.blitme()
         self.aliens.draw(self.screen)
+
+        if not self.stats.game_active:
+            self.play_button.draw_button()
+
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
 
@@ -157,6 +198,12 @@ class Invasion:
         for alien in self.aliens.sprites():
             alien.rect.y += self.settings.fleet_drop_speed
         self.settings.fleet_direction *= -1
+
+    def _check_aliens_bottom(self):
+        screen_rect = self.screen.get_rect()
+        for alien in self.aliens.sprites():
+            if alien.rect.bottom >= screen_rect.bottom:
+                self._ship_hit()
 
 if __name__ == "__main__":
     #Make our game instance
