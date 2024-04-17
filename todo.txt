@@ -9,7 +9,5 @@ Power ups-
     -thicker bullets
     -unlimited bullets
     -nuke from call of duty
-wave counter
-score counter
 bosses
  

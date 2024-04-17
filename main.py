@@ -29,7 +29,7 @@ class Invasion:
 
         self.play_button = Button(self, "Play")
 
-        pygame.display.set_caption("ALIENS VS KANYE")
+        pygame.display.set_caption("ALIENS VS KANYE 3D")
         icon = pygame.image.load("images\icon.png") 
         pygame.display.set_icon(icon)
         self.stats = GameStats(self)
@@ -85,7 +85,9 @@ class Invasion:
     def _ship_hit(self):
         """Responds to an alien hitting the ship"""
         if self.stats.ships_left > 0:
+            # Decrement ships_left, and update scoreboard.
             self.stats.ships_left -= 1
+            self.sb.prep_ships()
         else:
             self.stats.game_active = False
             pygame.mouse.set_visible(True)
@@ -114,11 +116,16 @@ class Invasion:
             for aliens in collisions.values():
                 self.stats.score += self.settings.alien_points * len(aliens)
             self.sb.prep_score()
+            self.sb.check_high_score()
         
         if not self.aliens:
             self.bullets.empty()
             self._create_fleet()
             self.settings.increase_speed()
+            
+            # Increase level.
+            self.stats.level += 1
+            self.sb.prep_level()
 
     def _check_events(self):
         #Watch for keyboard events
@@ -142,6 +149,8 @@ class Invasion:
             self.stats.reset_stats()
             self.stats.game_active = True
             self.sb.prep_score()
+            self.sb.prep_level()
+            self.sb.prep_ships()
 
             # Hide Mouse Cursor.
             pygame.mouse.set_visible(False)
