@@ -2,28 +2,28 @@ import pygame
 from pygame.sprite import Sprite
 
 class Alien(Sprite):
-    """A class to represent a single alien in the fleet"""
+    """A class to represent a single alien in the fleet."""
 
     def __init__(self, ai_game):
-        """Initializes the alien and set its starting position"""
+        """Initializes the alien and set its starting position."""
         super().__init__()
         self.screen = ai_game.screen
         self.settings = ai_game.settings
 
-        #Load the image and finds its rectangle
+        # Load the image and finds its rectangle.
         self.image = pygame.image.load('images/alien.png')
         self.rect = self.image.get_rect()
 
-        #Start each alien at the top of the screen
+        # Start each alien at the top of the screen.
         self.rect.x = self.rect.width
         self.rect.y = self.rect.height
 
-        #Store the alien's exact position
+        # Store the alien's exact position.
         self.x = float(self.rect.x)
 
     
     def update(self):
-        """Moves the alien right"""
+        """Moves the alien right."""
         self.x += self.settings.alien_speed * self.settings.fleet_direction
         self.rect.x = self.x
 

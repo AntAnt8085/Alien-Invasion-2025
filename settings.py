@@ -4,8 +4,15 @@ class Settings:
     def __init__(self):
         """Initialize the game settings"""
         #Screen Settings
-        self.screen_width = 1200
-        self.screen_height = 800
+        
+        self.screen_size = input("Would you like large or small screen? ")
+        if self.screen_size == "small":
+            self.screen_width = 800
+            self.screen_height = 600
+        if self.screen_size == "large":
+            self.screen_width = 1200
+            self.screen_height = 800
+        
         self.bg_color = (31, 31, 31)
 
         #Ship Settings
