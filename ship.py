@@ -9,7 +9,7 @@ class Ship():
         self.screen_rect = ai_game.screen.get_rect()
 
         #load the image
-        self.image = pygame.image.load("images/ship.bmp")
+        self.image = pygame.image.load("images/ship.png")
         self.rect = self.image.get_rect()
 
         #start the ship in the bottom middle of the screen
@@ -39,4 +39,3 @@ class Ship():
     def center_ship(self):
         self.rect.midbottom = self.screen_rect.midbottom
         self.x = float(self.rect.x)
-        print(self.rect.midbottom)

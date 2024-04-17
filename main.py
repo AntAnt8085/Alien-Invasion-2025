@@ -7,6 +7,7 @@ from alien import Alien
 from game_stats import GameStats
 from time import sleep
 from button import Button
+from Scoreboard import Scoreboard
 
 class Invasion:
     """This clas manges the behavior of the game"""
@@ -28,8 +29,11 @@ class Invasion:
 
         self.play_button = Button(self, "Play")
 
-        pygame.display.set_caption("Super Space Invaders 2025")
+        pygame.display.set_caption("ALIENS VS KANYE")
+        icon = pygame.image.load("images\icon.png") 
+        pygame.display.set_icon(icon)
         self.stats = GameStats(self)
+        self.sb = Scoreboard(self)
         self.bg_color = self.settings.bg_color
     
     def _create_fleet(self):
@@ -81,9 +85,7 @@ class Invasion:
     def _ship_hit(self):
         """Responds to an alien hitting the ship"""
         if self.stats.ships_left > 0:
-            print("Ship Hit!!!")
             self.stats.ships_left -= 1
-            print(f"Lives Left: {self.stats.ships_left}")
         else:
             self.stats.game_active = False
             pygame.mouse.set_visible(True)
@@ -102,16 +104,20 @@ class Invasion:
         for bullet in self.bullets.copy():
             if bullet.rect.bottom <= 0 :
                 self.bullets.remove(bullet)
-        #print(f"Total Number of Bullets: {len(self.bullets)}")
         self._check_bullet_alien_collision()
 
     def _check_bullet_alien_collision(self):
         #check for bullet collisions
         collisions = pygame.sprite.groupcollide(self.bullets, self.aliens, True, True)
+        
+        if collisions:
+            for aliens in collisions.values():
+                self.stats.score += self.settings.alien_points * len(aliens)
+            self.sb.prep_score()
+        
         if not self.aliens:
             self.bullets.empty()
             self._create_fleet()
-            print("Balls")
             self.settings.increase_speed()
 
     def _check_events(self):
@@ -135,6 +141,7 @@ class Invasion:
             self.settings.initialize_dynamic_settings()
             self.stats.reset_stats()
             self.stats.game_active = True
+            self.sb.prep_score()
 
             # Hide Mouse Cursor.
             pygame.mouse.set_visible(False)
@@ -175,6 +182,9 @@ class Invasion:
         self.screen.fill(self.bg_color)
         self.ship.blitme()
         self.aliens.draw(self.screen)
+        
+        # Draw the score infomation.
+        self.sb.show_score()
 
         if not self.stats.game_active:
             self.play_button.draw_button()
